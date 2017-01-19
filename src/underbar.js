@@ -40,7 +40,7 @@
   // last element.
   _.last = function(array, n) {
    if (n < array.length || n === undefined) {
-    return n === undefined ? array[array.length-1] : array.slice(1, n+1); }
+    return n === undefined ? array[array.length-1] : array.slice(array.length-n,array.length); }
     else {
       return array.slice(0, n);
     }
@@ -91,13 +91,19 @@
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
 
-    var result = [];
+    var result = []
 
-    _.each(collection, function(item, index) {
+
+   _.reduce(collection, function(memo,item) {
+     if (memo === true && item === collection[1]) {
+       result.push(memo)
+     }
       if (test(item) === true) {
         result.push(item)
-      }
-    })
+       }
+     }, collection[0])
+
+
 
     return result;
   };
@@ -108,11 +114,11 @@
     // copying code in and modifying it
     var result = [];
 
-    _.each(collection, function(item, index) {
+    _.each(collection, function(item) {
       if (test(item) === false) {
         result.push(item)
-      }
-    })
+       };
+     });
 
     return result
   };
@@ -141,16 +147,26 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
-    var val = 0;
-    var results = [];
+    var ans = [];
 
-    for (var i = 0; i < collection.length; i++) {
-      val = collection[i];
-      results.push(iterator(val))
-    }
+    _.reduce(collection, function (value,lock) {
+        if (value === collection[0] && lock === collection[1]) {
+        ans.push(value)
+        }
+        ans.push(lock)
+      }, collection[0])
 
-    return results
+
+// reduce should be returning an array to be used in map's iterator.
+   var result = [];
+
+   for (var i = 0; i < ans.length; i++) {
+     result.push(iterator(ans[i]))
+   }
+
+    return result
   };
+
 
   /*
    * TIP: map is really handy when you want to transform an array of
@@ -192,33 +208,19 @@
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
 
-   if (typeof collection[0] === 'number' && accumulator === 10) {
-     if (collection.length > 3) {
-       var result = [];
-       var grain = collection[0];
+    var flag = arguments.length > 2 ? true : false
 
-       for (var i = 0; i < collection.length; i++) {
-         grain = collection[i];
-         result.push(iterator(collection,grain))
-       };
-
-       return result;
-     }
-     var results = accumulator;
-     var grain = collection[0];
-
-     for (var i = 0; i < collection.length; i++) {
-       grain = collection[i];
-       results = iterator(results,grain)
-     }
-
-     return results
+    _.each(collection,function (item) {
+      if (!flag) {
+        accumulator = item;
+        flag = true
+      } else {
+        accumulator = iterator(accumulator,item)
+      }
+    });
+      return accumulator
   }
 
-
-    return iterator(accumulator,collection[0])
-
-  };
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
@@ -236,12 +238,31 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    var result = true
+
+    for (var i = 0; i < collection.length; i++) {
+      if (typeof iterator === 'function') {
+        if (iterator(collection[i]) === null || iterator(collection[i]) === false || iterator(collection[i]) === undefined || iterator(collection[i]) === 0) {
+          result = false;
+        }
+      };
+      if (typeof iterator === 'undefined') {
+        if (collection[i] === null || collection[i] === false || collection[i] === undefined || collection[i] === 0) {
+          result = false;
+        };
+      };
+    }
+
+    return result
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (typeof iterator === 'undefined') {
+      iterator = _.identity
+    }
   };
 
 
