@@ -245,12 +245,12 @@
         if (iterator(collection[i]) === null || iterator(collection[i]) === false || iterator(collection[i]) === undefined || iterator(collection[i]) === 0) {
           result = false;
         }
-      };
+      }
       if (typeof iterator === 'undefined') {
         if (collection[i] === null || collection[i] === false || collection[i] === undefined || collection[i] === 0) {
           result = false;
-        };
-      };
+        }
+      }
     }
 
     return result
@@ -270,7 +270,7 @@
           result = true;
           break;
         }
-      };
+      }
 
 
     return result
@@ -397,7 +397,7 @@
 
       if (result[mummify] === undefined) {
         result[mummify] = value;
-      };
+      }
       return result[mummify]
     }
 
@@ -410,6 +410,9 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+    return setTimeout.apply(this,arguments);
+
   };
 
 
@@ -424,6 +427,24 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+
+    var shuffled = [];
+
+    function getRandomIntInclusive(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    while (shuffled.length < array.length) {
+      var randomNum = getRandomIntInclusive(0, array.length-1)
+      if (shuffled.includes(array[randomNum])) {
+        continue;
+      }
+      shuffled.push(array[randomNum]);
+    }
+
+    return shuffled
   };
 
 
