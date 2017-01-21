@@ -263,6 +263,17 @@
     if (typeof iterator === 'undefined') {
       iterator = _.identity
     }
+    var result = false;
+
+    for (var i = 0; i < collection.length; i++) {
+        if (iterator(collection[i]) === true || typeof iterator(collection[i]) === 'number' && collection[i] !== 0 || typeof iterator(collection[i]) === 'string') {
+          result = true;
+          break;
+        }
+      };
+
+
+    return result
   };
 
 
@@ -285,11 +296,42 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+
+     // use each
+     // create new keys
+
+     // _.each(source1, function (value, key) {
+     //    obj[key] = value;
+     // })
+
+     // _.each(source2, function (value, key) {
+     //    obj[key] = value;
+     // })
+
+     // return obj
+
+         _.each(arguments, function (argument) {
+        _.each(argument, function (value, key) {
+          obj[key] = value;
+        })
+    })
+
+    return obj
+
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    _.each(arguments, function (argument) {
+      _.each(argument, function (value, key) {
+        if (obj[key] === undefined) {
+          obj[key] = value;
+        }
+
+      })
+    })
+    return obj;
   };
 
 
@@ -315,7 +357,7 @@
     return function() {
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
-        // infromation from one function call to another.
+        // information from one function call to another.
         result = func.apply(this, arguments);
         alreadyCalled = true;
       }
@@ -333,6 +375,32 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+
+    // create object, store arguments as keys and values as results
+    // if key already exists, return value
+    // if key does not exist, create new key with new value
+    // where the object is created
+    // what this function is returnin
+    // reference once
+
+    var result = {};
+
+    return function () {
+      var mummify = JSON.stringify(arguments)
+
+      if (mummify in result) {
+        return result[mummify]
+      }
+
+      var value = func.apply(this, arguments)
+
+      if (result[mummify] === undefined) {
+        result[mummify] = value;
+      };
+      return result[mummify]
+    }
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
